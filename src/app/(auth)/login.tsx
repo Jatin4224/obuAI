@@ -52,7 +52,6 @@ export default function LoginScreen() {
           contentContainerClassName="px-5 pb-8"
           keyboardShouldPersistTaps="handled"
         >
-          {/* Back */}
           <TouchableOpacity
             onPress={() => router.back()}
             className="mt-4 mb-8 self-start"
@@ -61,13 +60,11 @@ export default function LoginScreen() {
             <Text className="text-accent font-semibold text-base">← Back</Text>
           </TouchableOpacity>
 
-          {/* Header */}
           <View className="gap-2 mb-8">
             <Text className="text-primary text-3xl font-bold tracking-tight">Welcome back</Text>
             <Text className="text-muted text-base">Sign in to continue your bulk journey.</Text>
           </View>
 
-          {/* Form */}
           <View className="gap-4">
             <View className="gap-1.5">
               <Text className="text-primary text-sm font-medium">Email</Text>
@@ -110,7 +107,6 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Footer links */}
           <View className="items-center gap-4 mt-8">
             <TouchableOpacity activeOpacity={0.7}>
               <Text className="text-muted text-sm">Forgot password?</Text>

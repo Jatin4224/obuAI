@@ -1,19 +1,15 @@
 import '../global.css';
 
 import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
-import * as SecureStore from 'expo-secure-store';
+import { tokenCache } from '@clerk/clerk-expo/token-cache';
 import { ConvexProviderWithClerk } from 'convex/react-clerk';
 import { ConvexReactClient } from 'convex/react';
 import { Slot } from 'expo-router';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Platform, View } from 'react-native';
 
 const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
 const convex = convexUrl ? new ConvexReactClient(convexUrl) : null;
-
-const tokenCache = {
-  getToken: (key: string) => SecureStore.getItemAsync(key),
-  saveToken: (key: string, value: string) => SecureStore.setItemAsync(key, value),
-  clearToken: (key: string) => SecureStore.deleteItemAsync(key),
-};
 
 function ConvexWrapper({ children }: { children: React.ReactNode }) {
   if (!convex) return <>{children}</>;
@@ -26,13 +22,19 @@ function ConvexWrapper({ children }: { children: React.ReactNode }) {
 
 export default function RootLayout() {
   return (
-    <ClerkProvider
-      publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
-      tokenCache={tokenCache}
-    >
-      <ConvexWrapper>
-        <Slot />
-      </ConvexWrapper>
-    </ClerkProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ClerkProvider
+        publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
+        tokenCache={tokenCache}
+      >
+        <ConvexWrapper>
+          <Slot />
+        </ConvexWrapper>
+      </ClerkProvider>
+      {/* Clerk Smart CAPTCHA anchor — required for custom auth flows on web */}
+      {Platform.OS === 'web' && (
+        <View nativeID="clerk-captcha" style={{ position: 'absolute', width: 0, height: 0, opacity: 0 }} />
+      )}
+    </GestureHandlerRootView>
   );
 }

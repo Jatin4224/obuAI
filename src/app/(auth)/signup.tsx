@@ -62,7 +62,7 @@ export default function SignUpScreen() {
     try {
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
       Alert.alert('Code sent', 'A new verification code has been sent to your email.');
-    } catch (err: any) {
+    } catch {
       Alert.alert('Error', 'Failed to resend code. Please try again.');
     }
   };
@@ -88,7 +88,9 @@ export default function SignUpScreen() {
             </TouchableOpacity>
 
             <View className="gap-2 mb-8">
-              <Text className="text-primary text-3xl font-bold tracking-tight">Check your email</Text>
+              <Text className="text-primary text-3xl font-bold tracking-tight">
+                Check your email
+              </Text>
               <Text className="text-muted text-base">
                 We sent a 6-digit code to{'\n'}
                 <Text className="text-primary font-medium">{email}</Text>
@@ -147,7 +149,6 @@ export default function SignUpScreen() {
           contentContainerClassName="px-5 pb-8"
           keyboardShouldPersistTaps="handled"
         >
-          {/* Back */}
           <TouchableOpacity
             onPress={() => router.back()}
             className="mt-4 mb-8 self-start"
@@ -156,7 +157,6 @@ export default function SignUpScreen() {
             <Text className="text-accent font-semibold text-base">← Back</Text>
           </TouchableOpacity>
 
-          {/* Header */}
           <View className="gap-2 mb-8">
             <Text className="text-primary text-3xl font-bold tracking-tight">Create account</Text>
             <Text className="text-muted text-base">
@@ -164,7 +164,6 @@ export default function SignUpScreen() {
             </Text>
           </View>
 
-          {/* Form */}
           <View className="gap-4">
             <View className="gap-1.5">
               <Text className="text-primary text-sm font-medium">Email</Text>
@@ -211,7 +210,6 @@ export default function SignUpScreen() {
             </Text>
           </View>
 
-          {/* Footer */}
           <View className="flex-row items-center justify-center gap-1 mt-8">
             <Text className="text-muted text-sm">Already have an account?</Text>
             <TouchableOpacity onPress={() => router.replace('/(auth)/login')} activeOpacity={0.7}>
