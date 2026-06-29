@@ -57,7 +57,7 @@ export default function StepPlanIncluded() {
       <View style={s.bottom}>
         <TouchableOpacity
           style={s.btn}
-          onPress={() => router.replace('/(auth)/welcome')}
+          onPress={() => router.push('/(onboarding)/step-save-progress')}
           activeOpacity={0.85}
         >
           <Text style={s.btnLabel}>Continue</Text>

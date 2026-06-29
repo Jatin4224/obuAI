@@ -58,6 +58,7 @@ export default function OnboardingLayout() {
         <Stack.Screen name="step-gym-experience" options={NO_HEADER} />
         <Stack.Screen name="step-calorie-target" options={NO_HEADER} />
         <Stack.Screen name="step-plan-included" options={NO_HEADER} />
+        <Stack.Screen name="step-save-progress" options={NO_HEADER} />
       </Stack>
     </OnboardingContext.Provider>
   );
