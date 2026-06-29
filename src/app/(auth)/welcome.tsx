@@ -1,5 +1,6 @@
 import { useSSO, useSignIn, useSignInWithApple, useSignUp } from "@clerk/clerk-expo";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -449,6 +450,7 @@ function VerifyView({ email, code, loading, onCodeChange, onVerify, onResend }: 
 // ─── Welcome Screen ───────────────────────────────────────────────────────────
 export default function WelcomeScreen() {
   const [showSheet, setShowSheet] = useState(false);
+  const router = useRouter();
 
   return (
     <SafeAreaView style={s.root} edges={["top", "bottom"]}>
@@ -472,7 +474,11 @@ export default function WelcomeScreen() {
       </View>
 
       <View style={s.bottom}>
-        <TouchableOpacity style={s.btnPrimary} onPress={() => { setShowSheet(true); }} activeOpacity={0.85}>
+        <TouchableOpacity
+          style={s.btnPrimary}
+          onPress={() => router.push("/(onboarding)/step-welcome")}
+          activeOpacity={0.85}
+        >
           <Text style={s.btnPrimaryLabel}>Get Started  →</Text>
         </TouchableOpacity>
         <TouchableOpacity style={s.btnSecondary} onPress={() => setShowSheet(true)} activeOpacity={0.85}>
