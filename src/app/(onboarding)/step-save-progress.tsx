@@ -1,6 +1,6 @@
-import { useSSO, useSignInWithApple } from '@clerk/clerk-expo';
+import { useAuth, useSSO, useSignInWithApple } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Platform,
@@ -11,41 +11,31 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// ─── Google G icon ────────────────────────────────────────────────────────────
-function GoogleG({ size = 20 }: { size?: number }) {
-  const inner = size * 0.6;
-  const off = (size - inner) / 2;
-  return (
-    <View style={{ width: size, height: size }}>
-      <View style={{ width: size, height: size, borderRadius: size / 2, overflow: 'hidden' }}>
-        <View style={{ flex: 1, flexDirection: 'row' }}>
-          <View style={{ flex: 1, backgroundColor: '#4285F4' }} />
-          <View style={{ flex: 1, backgroundColor: '#EA4335' }} />
-        </View>
-        <View style={{ flex: 1, flexDirection: 'row' }}>
-          <View style={{ flex: 1, backgroundColor: '#34A853' }} />
-          <View style={{ flex: 1, backgroundColor: '#FBBC05' }} />
-        </View>
-      </View>
-      <View style={{
-        position: 'absolute', width: inner, height: inner,
-        borderRadius: inner / 2, backgroundColor: '#fff',
-        top: off, left: off, alignItems: 'center', justifyContent: 'center',
-      }}>
-        <Text style={{ fontSize: size * 0.44, fontWeight: '900', color: '#4285F4', lineHeight: size * 0.5 }}>
-          G
-        </Text>
-      </View>
-    </View>
-  );
-}
+import { GoogleG, SignInSheet } from '@/components/auth/SignInSheet';
+import { saveDraft } from '@/lib/onboardingDraft';
+import { useOnboarding } from './_layout';
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 export default function StepSaveProgress() {
   const router = useRouter();
+  const { isSignedIn } = useAuth();
+  const { data } = useOnboarding();
   const { startSSOFlow } = useSSO();
   const { startAppleAuthenticationFlow } = useSignInWithApple();
   const [loading, setLoading] = useState(false);
+  const [showEmailSheet, setShowEmailSheet] = useState(false);
+
+  // Persist answers on-device so they survive the sign-in handoff; the root index syncs them to Convex.
+  const draftSaved = useRef<Promise<unknown>>(Promise.resolve());
+  useEffect(() => {
+    draftSaved.current = saveDraft(data).catch(() => false);
+  }, [data]);
+
+  // Every sign-in method (Apple, Google, email sheet) ends up here
+  useEffect(() => {
+    if (!isSignedIn) return;
+    draftSaved.current.finally(() => router.replace('/'));
+  }, [isSignedIn]);
 
   const handleApple = async () => {
     if (Platform.OS !== 'ios') {
@@ -55,10 +45,7 @@ export default function StepSaveProgress() {
     try {
       setLoading(true);
       const { createdSessionId, setActive } = await startAppleAuthenticationFlow();
-      if (createdSessionId && setActive) {
-        await setActive({ session: createdSessionId });
-        router.replace('/(tabs)');
-      }
+      if (createdSessionId && setActive) await setActive({ session: createdSessionId });
     } catch (err: any) {
       if (err?.code !== 'ERR_CANCELED')
         Alert.alert('Error', err.errors?.[0]?.longMessage ?? 'Apple sign-in failed.');
@@ -71,19 +58,12 @@ export default function StepSaveProgress() {
     try {
       setLoading(true);
       const { createdSessionId, setActive } = await startSSOFlow({ strategy: 'oauth_google' });
-      if (createdSessionId && setActive) {
-        await setActive({ session: createdSessionId });
-        router.replace('/(tabs)');
-      }
+      if (createdSessionId && setActive) await setActive({ session: createdSessionId });
     } catch (err: any) {
       Alert.alert('Error', err.errors?.[0]?.longMessage ?? 'Google sign-in failed.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleEmail = () => {
-    router.push('/(auth)/welcome');
   };
 
   return (
@@ -125,7 +105,7 @@ export default function StepSaveProgress() {
 
         <TouchableOpacity
           style={s.btnOutline}
-          onPress={handleEmail}
+          onPress={() => setShowEmailSheet(true)}
           disabled={loading}
           activeOpacity={0.88}
         >
@@ -133,6 +113,12 @@ export default function StepSaveProgress() {
           <Text style={s.btnOutlineLabel}>Continue with email</Text>
         </TouchableOpacity>
       </View>
+
+      <SignInSheet
+        visible={showEmailSheet}
+        onClose={() => setShowEmailSheet(false)}
+        initialView="signup"
+      />
     </SafeAreaView>
   );
 }

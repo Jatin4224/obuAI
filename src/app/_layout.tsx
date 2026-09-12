@@ -8,6 +8,8 @@ import { Slot } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Platform, View } from 'react-native';
 
+import { SubscriptionProvider } from '@/hooks/useSubscription';
+
 const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
 const convex = convexUrl ? new ConvexReactClient(convexUrl) : null;
 
@@ -28,7 +30,9 @@ export default function RootLayout() {
         tokenCache={tokenCache}
       >
         <ConvexWrapper>
-          <Slot />
+          <SubscriptionProvider>
+            <Slot />
+          </SubscriptionProvider>
         </ConvexWrapper>
       </ClerkProvider>
       {/* Clerk Smart CAPTCHA anchor — required for custom auth flows on web */}

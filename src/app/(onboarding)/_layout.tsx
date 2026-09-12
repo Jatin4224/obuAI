@@ -1,6 +1,14 @@
 import { Stack } from 'expo-router';
 import { createContext, useContext, useState } from 'react';
 
+export type OnboardingGoals = {
+  calories: number;
+  proteinG: number;
+  carbsG: number;
+  fatsG: number;
+  estimatedWeeksToGoal: number;
+};
+
 export type OnboardingData = {
   gender: 'male' | 'female' | null;
   heightCm: number;
@@ -8,6 +16,7 @@ export type OnboardingData = {
   goalWeightKg: number;
   activityLevel: 'low' | 'moderate' | 'active' | 'very_active' | null;
   gymExperience: 'beginner' | 'intermediate' | 'advanced' | null;
+  goals: OnboardingGoals | null;
 };
 
 type OnboardingContextType = {
@@ -15,15 +24,18 @@ type OnboardingContextType = {
   update: (partial: Partial<OnboardingData>) => void;
 };
 
+const DEFAULT_DATA: OnboardingData = {
+  gender: null,
+  heightCm: 175,
+  currentWeightKg: 52,
+  goalWeightKg: 70,
+  activityLevel: null,
+  gymExperience: null,
+  goals: null,
+};
+
 export const OnboardingContext = createContext<OnboardingContextType>({
-  data: {
-    gender: null,
-    heightCm: 175,
-    currentWeightKg: 52,
-    goalWeightKg: 70,
-    activityLevel: null,
-    gymExperience: null,
-  },
+  data: DEFAULT_DATA,
   update: () => {},
 });
 
@@ -34,14 +46,7 @@ export function useOnboarding() {
 const NO_HEADER = { headerShown: false } as const;
 
 export default function OnboardingLayout() {
-  const [data, setData] = useState<OnboardingData>({
-    gender: null,
-    heightCm: 175,
-    currentWeightKg: 52,
-    goalWeightKg: 70,
-    activityLevel: null,
-    gymExperience: null,
-  });
+  const [data, setData] = useState<OnboardingData>(DEFAULT_DATA);
 
   const update = (partial: Partial<OnboardingData>) =>
     setData(prev => ({ ...prev, ...partial }));

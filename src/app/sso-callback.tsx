@@ -11,8 +11,8 @@ export default function SSOCallbackPage() {
     async function finish() {
       try {
         await handleRedirectCallback({
-          afterSignInUrl: '/(tabs)',
-          afterSignUpUrl: '/(tabs)',
+          afterSignInUrl: '/',
+          afterSignUpUrl: '/',
         });
       } catch {
         // If callback handling fails (e.g. session already active), go home

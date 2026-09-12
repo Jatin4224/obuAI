@@ -1,7 +1,19 @@
-import { Tabs } from 'expo-router';
+import { useAuth } from '@clerk/clerk-expo';
+import { Redirect, Tabs } from 'expo-router';
 import { Text } from 'react-native';
 
+import { LoadingScreen } from '@/components/shared/LoadingScreen';
+import { useSubscription } from '@/hooks/useSubscription';
+
 export default function TabsLayout() {
+  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoading, isPremium } = useSubscription();
+
+  // Hard paywall: the app is only reachable with an active trial/subscription
+  if (!isLoaded || isLoading) return <LoadingScreen />;
+  if (!isSignedIn) return <Redirect href="/" />;
+  if (!isPremium) return <Redirect href="/paywall" />;
+
   return (
     <Tabs
       screenOptions={{

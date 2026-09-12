@@ -303,13 +303,27 @@ function ResultsView({
 
 export default function StepCalorieTarget() {
   const router = useRouter();
-  const { data } = useOnboarding();
+  const { data, update } = useOnboarding();
 
   const [phase, setPhase] = useState<'calculating' | 'done'>('calculating');
   const [checkedCount, setCheckedCount] = useState(0);
   const [statusIdx, setStatusIdx] = useState(0);
   const [result, setResult] = useState<NutritionResult | null>(null);
   const progressAnim = useRef(new Animated.Value(0)).current;
+
+  // Keep the calculated goals in onboarding state so they're saved after sign-in
+  useEffect(() => {
+    if (!result) return;
+    update({
+      goals: {
+        calories: Math.round(Number(result.calories)),
+        proteinG: Math.round(Number(result.proteinG)),
+        carbsG: Math.round(Number(result.carbsG)),
+        fatsG: Math.round(Number(result.fatsG)),
+        estimatedWeeksToGoal: Math.max(0, Math.round(Number(result.estimatedWeeksToGoal))),
+      },
+    });
+  }, [result]);
 
   const pendingResult = useRef<NutritionResult | null>(null);
   const animDone = useRef(false);
